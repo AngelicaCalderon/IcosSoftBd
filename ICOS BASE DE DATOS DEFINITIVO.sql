@@ -1,0 +1,1 @@
+presentacionSELECT * FROM icos.producto;
