@@ -1,0 +1,247 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema ICOS
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema ICOS
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `ICOS` DEFAULT CHARACTER SET utf8 ;
+USE `ICOS` ;
+
+-- -----------------------------------------------------
+-- Table `ICOS`.`ROLES`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ICOS`.`ROLES` ;
+
+CREATE TABLE IF NOT EXISTS `ICOS`.`ROLES` (
+  `id_rol` INT NOT NULL AUTO_INCREMENT,
+  `nombre_rol` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id_rol`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ICOS`.`CATALOGO`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ICOS`.`CATALOGO` ;
+
+CREATE TABLE IF NOT EXISTS `ICOS`.`CATALOGO` (
+  `id_catalogo` INT NOT NULL AUTO_INCREMENT,
+  `nombre_parametros` VARCHAR(45) NULL,
+  `valor_parametro` VARCHAR(45) NULL,
+  PRIMARY KEY (`id_catalogo`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ICOS`.`USUARIOS`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ICOS`.`USUARIOS` ;
+
+CREATE TABLE IF NOT EXISTS `ICOS`.`USUARIOS` (
+  `id_usuario` INT NOT NULL AUTO_INCREMENT,
+  `usuario` VARCHAR(45) NOT NULL,
+  `nombre` VARCHAR(45) NOT NULL,
+  `apellido` VARCHAR(45) NOT NULL,
+  `contraseña` VARCHAR(45) NOT NULL,
+  `correo_ electronico` VARCHAR(45) NULL,
+  `ROLES_id_rol` INT NOT NULL,
+  `tipo_identificacion` VARCHAR(45) NULL,
+  `CATALOGO_id_catalogo` INT NOT NULL,
+  PRIMARY KEY (`id_usuario`),
+  INDEX `fk_USUARIOS_ROLES_idx` (`ROLES_id_rol` ASC) VISIBLE,
+  INDEX `fk_USUARIOS_CATALOGO1_idx` (`CATALOGO_id_catalogo` ASC) VISIBLE,
+  CONSTRAINT `fk_USUARIOS_ROLES`
+    FOREIGN KEY (`ROLES_id_rol`)
+    REFERENCES `ICOS`.`ROLES` (`id_rol`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_USUARIOS_CATALOGO1`
+    FOREIGN KEY (`CATALOGO_id_catalogo`)
+    REFERENCES `ICOS`.`CATALOGO` (`id_catalogo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ICOS`.`PRODUCTO`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ICOS`.`PRODUCTO` ;
+
+CREATE TABLE IF NOT EXISTS `ICOS`.`PRODUCTO` (
+  `id_producto` INT NOT NULL AUTO_INCREMENT,
+  `nombre_producto` VARCHAR(45) NOT NULL,
+  `valor_venta` DOUBLE NOT NULL,
+  `stock` INT NOT NULL,
+  `fecha_expiracion` DATETIME NOT NULL,
+  PRIMARY KEY (`id_producto`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ICOS`.`PRESENTACION`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ICOS`.`PRESENTACION` ;
+
+CREATE TABLE IF NOT EXISTS `ICOS`.`PRESENTACION` (
+  `id_presentaciones` INT NOT NULL AUTO_INCREMENT,
+  `presentacion` VARCHAR(45) NOT NULL,
+  `PRODUCTO_id_producto` INT NOT NULL,
+  PRIMARY KEY (`id_presentaciones`),
+  INDEX `fk_PRESENTACION_PRODUCTO1_idx` (`PRODUCTO_id_producto` ASC) VISIBLE,
+  CONSTRAINT `fk_PRESENTACION_PRODUCTO1`
+    FOREIGN KEY (`PRODUCTO_id_producto`)
+    REFERENCES `ICOS`.`PRODUCTO` (`id_producto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ICOS`.`TIPO_PRODUCTO`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ICOS`.`TIPO_PRODUCTO` ;
+
+CREATE TABLE IF NOT EXISTS `ICOS`.`TIPO_PRODUCTO` (
+  `id_tipo_producto` INT NOT NULL AUTO_INCREMENT,
+  `tipo` VARCHAR(45) NOT NULL,
+  `PRODUCTO_id_producto` INT NOT NULL,
+  PRIMARY KEY (`id_tipo_producto`),
+  INDEX `fk_TIPO_PRODUCTO_PRODUCTO1_idx` (`PRODUCTO_id_producto` ASC) VISIBLE,
+  CONSTRAINT `fk_TIPO_PRODUCTO_PRODUCTO1`
+    FOREIGN KEY (`PRODUCTO_id_producto`)
+    REFERENCES `ICOS`.`PRODUCTO` (`id_producto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ICOS`.`PROVEEDOR`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ICOS`.`PROVEEDOR` ;
+
+CREATE TABLE IF NOT EXISTS `ICOS`.`PROVEEDOR` (
+  `id_proveedor` INT NOT NULL AUTO_INCREMENT,
+  `razon_social` VARCHAR(45) NOT NULL,
+  `PRODUCTO_id_producto` INT NOT NULL,
+  PRIMARY KEY (`id_proveedor`),
+  INDEX `fk_PROVEEDOR_PRODUCTO1_idx` (`PRODUCTO_id_producto` ASC) VISIBLE,
+  CONSTRAINT `fk_PROVEEDOR_PRODUCTO1`
+    FOREIGN KEY (`PRODUCTO_id_producto`)
+    REFERENCES `ICOS`.`PRODUCTO` (`id_producto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ICOS`.`Detalles_Ventas`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ICOS`.`Detalles_Ventas` ;
+
+CREATE TABLE IF NOT EXISTS `ICOS`.`Detalles_Ventas` (
+  `id_detalle_ventas` INT NOT NULL AUTO_INCREMENT,
+  `fecha_venta` DATETIME NOT NULL,
+  `cantidad` INT NOT NULL,
+  `valor_unitario` DOUBLE NOT NULL,
+  `valor_total` DOUBLE NOT NULL,
+  `USUARIOS_id_usuario` INT NOT NULL,
+  PRIMARY KEY (`id_detalle_ventas`),
+  INDEX `fk_Detalles_Ventas_USUARIOS1_idx` (`USUARIOS_id_usuario` ASC) VISIBLE,
+  CONSTRAINT `fk_Detalles_Ventas_USUARIOS1`
+    FOREIGN KEY (`USUARIOS_id_usuario`)
+    REFERENCES `ICOS`.`USUARIOS` (`id_usuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ICOS`.`Detalle_Compra`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ICOS`.`Detalle_Compra` ;
+
+CREATE TABLE IF NOT EXISTS `ICOS`.`Detalle_Compra` (
+  `id_detalle` INT NOT NULL AUTO_INCREMENT,
+  `id_usuario` INT NULL,
+  `id_factura_compra` INT NULL,
+  `cantidad` INT NULL,
+  `precion_unitario_producto` DOUBLE NULL,
+  `precio_total_producto` DOUBLE NULL,
+  `PROVEEDOR_id_proveedor` INT NOT NULL,
+  `USUARIOS_id_usuario` INT NOT NULL,
+  PRIMARY KEY (`id_detalle`),
+  INDEX `fk_Detalle_Compra_PROVEEDOR1_idx` (`PROVEEDOR_id_proveedor` ASC) VISIBLE,
+  INDEX `fk_Detalle_Compra_USUARIOS1_idx` (`USUARIOS_id_usuario` ASC) VISIBLE,
+  CONSTRAINT `fk_Detalle_Compra_PROVEEDOR1`
+    FOREIGN KEY (`PROVEEDOR_id_proveedor`)
+    REFERENCES `ICOS`.`PROVEEDOR` (`id_proveedor`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Detalle_Compra_USUARIOS1`
+    FOREIGN KEY (`USUARIOS_id_usuario`)
+    REFERENCES `ICOS`.`USUARIOS` (`id_usuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ICOS`.`Detalle_Compra_has_PRODUCTO`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ICOS`.`Detalle_Compra_has_PRODUCTO` ;
+
+CREATE TABLE IF NOT EXISTS `ICOS`.`Detalle_Compra_has_PRODUCTO` (
+  `Detalle_Compra_id_detalle` INT NOT NULL,
+  `PRODUCTO_id_producto` INT NOT NULL,
+  PRIMARY KEY (`Detalle_Compra_id_detalle`, `PRODUCTO_id_producto`),
+  INDEX `fk_Detalle_Compra_has_PRODUCTO_PRODUCTO1_idx` (`PRODUCTO_id_producto` ASC) VISIBLE,
+  INDEX `fk_Detalle_Compra_has_PRODUCTO_Detalle_Compra1_idx` (`Detalle_Compra_id_detalle` ASC) VISIBLE,
+  CONSTRAINT `fk_Detalle_Compra_has_PRODUCTO_Detalle_Compra1`
+    FOREIGN KEY (`Detalle_Compra_id_detalle`)
+    REFERENCES `ICOS`.`Detalle_Compra` (`id_detalle`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Detalle_Compra_has_PRODUCTO_PRODUCTO1`
+    FOREIGN KEY (`PRODUCTO_id_producto`)
+    REFERENCES `ICOS`.`PRODUCTO` (`id_producto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ICOS`.`PRODUCTO_has_Detalles_Ventas`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ICOS`.`PRODUCTO_has_Detalles_Ventas` ;
+
+CREATE TABLE IF NOT EXISTS `ICOS`.`PRODUCTO_has_Detalles_Ventas` (
+  `PRODUCTO_id_producto` INT NOT NULL,
+  `Detalles_Ventas_id_detalle_ventas` INT NOT NULL,
+  PRIMARY KEY (`PRODUCTO_id_producto`, `Detalles_Ventas_id_detalle_ventas`),
+  INDEX `fk_PRODUCTO_has_Detalles_Ventas_Detalles_Ventas1_idx` (`Detalles_Ventas_id_detalle_ventas` ASC) VISIBLE,
+  INDEX `fk_PRODUCTO_has_Detalles_Ventas_PRODUCTO1_idx` (`PRODUCTO_id_producto` ASC) VISIBLE,
+  CONSTRAINT `fk_PRODUCTO_has_Detalles_Ventas_PRODUCTO1`
+    FOREIGN KEY (`PRODUCTO_id_producto`)
+    REFERENCES `ICOS`.`PRODUCTO` (`id_producto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_PRODUCTO_has_Detalles_Ventas_Detalles_Ventas1`
+    FOREIGN KEY (`Detalles_Ventas_id_detalle_ventas`)
+    REFERENCES `ICOS`.`Detalles_Ventas` (`id_detalle_ventas`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
